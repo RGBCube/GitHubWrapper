@@ -94,7 +94,7 @@ class HTTPClient:
     _last_ping: float
     _latency: float
 
-    def __new__(cls, **kwargs) -> Awaitable[Self]:
+    def __new__(cls, **kwargs) -> Awaitable[HTTPClient]:
         # Basically async def __init__
         return cls.__async_init(**kwargs)
 
@@ -129,7 +129,7 @@ class HTTPClient:
         async def on_request_start(
             _: ClientSession, __: SimpleNamespace, params: TraceRequestStartParams
         ) -> None:
-            if self.ratelimited:
+            if self.is_ratelimited:
                 log.info(
                     "Ratelimit exceeded, trying again in"
                     f" {human_readable_time_until(self._rates.reset_time - datetime.now(timezone.utc))} (URL:"
@@ -174,8 +174,11 @@ class HTTPClient:
     async def __aexit__(self, *_) -> None:
         await self.__session.close()
 
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}>"
+
     @property
-    def ratelimited(self) -> bool:
+    def is_ratelimited(self) -> bool:
         remaining = self._rates.remaining
         return remaining is not None and remaining < 2
 
@@ -185,7 +188,7 @@ class HTTPClient:
             last_ping = self._last_ping
 
             # If there was no ping or the last ping was more than 5 seconds ago.
-            if not last_ping or time.monotonic() > last_ping + 5 or self.ratelimited:
+            if not last_ping or time.monotonic() > last_ping + 5 or self.is_ratelimited:
                 self._last_ping = time.monotonic()
 
                 start = time.monotonic()
