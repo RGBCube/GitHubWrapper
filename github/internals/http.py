@@ -511,7 +511,7 @@ class HTTPClient:
 
         return await self.request("GET", f"/repos/{owner}/{repo}/teams", params=params)
 
-    async def get_all_topic_for_repo(
+    async def get_all_topics_for_repo(
         self, *, owner: str, repo: str, per_page: Optional[int] = None, page: Optional[int] = None
     ):
         params = {}
