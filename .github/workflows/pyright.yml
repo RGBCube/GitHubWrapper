@@ -25,4 +25,4 @@ jobs:
           poetry install --no-dev
 
       - name: Run PyRight
-        run: pyright ./
+        run: poetry run pyright ./
