@@ -79,7 +79,10 @@ copyright = '2022 - Present, VarMonke & sudosnok'
 
 version = ''
 with open('../github/__init__.py') as f:
-    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)  # type: ignore
+    version = re.search(
+        r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE
+    )[1]
+
 
 # The full version, including alpha/beta/rc tags.
 release = version
@@ -165,8 +168,9 @@ resource_links = {
     'discord': 'https://discord.gg/W2SDTtMrZA',
     'issues': 'https://github.com/VarMonke/Github-Api-Wrapper/issues',
     'discussions': 'https://github.com/VarMonke/Github-Api-Wrapper/discussions',
-    'examples': f'https://github.com/VarMonke/Github-Api-Wrapper/examples',
+    'examples': 'https://github.com/VarMonke/Github-Api-Wrapper/examples',
 }
+
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

@@ -128,10 +128,10 @@ class User(_BaseUser):
         for key, value in keys.items():
             if '_at' in key and value is not None:
                 setattr(self, key, dt_formatter(value))
-                continue
             else:
                 setattr(self, key, value)
-                continue
+
+            continue
 
     def __repr__(self) -> str:
         return f'<{self.__class__.__name__} login: {self.login!r}, id: {self.id}, created_at: {self.created_at}>'
@@ -336,11 +336,10 @@ class Issue(APIObject):
 
             if key == 'closed_by':
                 setattr(self, key, User(value, self._http))
-                continue
-
             else:
                 setattr(self, key, value)
-                continue
+
+            continue
 
     def __repr__(self) -> str:
         return (
@@ -511,11 +510,10 @@ class Organization(APIObject):
                 continue
             if '_at' in key and value is not None:
                 setattr(self, key, dt_formatter(value))
-                continue
-
             else:
                 setattr(self, key, value)
-                continue
+
+            continue
 
     def __repr__(self):
         return (
