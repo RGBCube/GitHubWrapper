@@ -1,6 +1,6 @@
 __all__ = ("SecurtiyAndAnalysis",)
 
-from typing import Literal, TypedDict, TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal, TypedDict
 
 if TYPE_CHECKING:
     from typing_extensions import NotRequired
