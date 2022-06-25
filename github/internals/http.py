@@ -93,14 +93,9 @@ class HTTPClient:
     _last_ping: float
     _latency: float
 
-    def __new__(
-        cls,
-        *,
-        headers: Optional[Dict[str, Union[str, int]]] = None,
-        auth: Optional[BasicAuth] = None,
-    ) -> Awaitable[Self]:
+    def __new__(cls, **kwargs) -> Awaitable[Self]:
         # Basically async def __init__
-        return cls.__async_init()
+        return cls.__async_init(**kwargs)
 
     @classmethod
     async def __async_init(
