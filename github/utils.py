@@ -14,10 +14,6 @@ from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
     from datetime import datetime, timedelta
 
-    from aiohttp import ClientResponse
-
-    from .errors import BaseHTTPError
-
 
 def human_readable_time_until(td: timedelta, /) -> str:
     seconds = int(td.total_seconds())

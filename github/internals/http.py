@@ -11,8 +11,8 @@ from typing import TYPE_CHECKING, Any, Awaitable, Dict, List, Literal, NamedTupl
 
 from aiohttp import ClientSession, TraceConfig, __version__ as aiohttp_verrsion
 
-from ..utils import human_readable_time_until
 from ..errors import error_from_request
+from ..utils import human_readable_time_until
 
 if TYPE_CHECKING:
     from types import SimpleNamespace
@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
     from ..objects import File
     from ..types import SecurtiyAndAnalysis
+
 
 log = logging.getLogger("github")
 

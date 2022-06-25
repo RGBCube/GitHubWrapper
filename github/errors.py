@@ -47,6 +47,7 @@ class RatelimitReached(GitHubError):
             f" {human_readable_time_until(datetime.now(timezone.utc) - self.reset_time)}"
         )
 
+
 def error_from_request(request: ClientResponse, /) -> BaseHTTPError:
     # TODO: Make specific errrors
     return HTTPError(request)
