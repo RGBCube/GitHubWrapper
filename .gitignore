@@ -1,5 +1,7 @@
-# Used for developer debugging
+# Used for debugging by the developers
 shell.py
+test*.*
+test/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -45,7 +47,6 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # Unit test / coverage reports
-test*.*
 htmlcov/
 .tox/
 .nox/
