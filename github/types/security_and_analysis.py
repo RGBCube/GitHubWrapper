@@ -1,8 +1,9 @@
-from typing import Literal, TypedDict
-
-from typing_extensions import NotRequired
-
 __all__ = ("SecurtiyAndAnalysis",)
+
+from typing import Literal, TypedDict, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing_extensions import NotRequired
 
 
 class AdvancedSecurity(TypedDict):

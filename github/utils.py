@@ -5,7 +5,6 @@ __all__ = (
     "str_to_datetime",
     "repr_dt",
     "bytes_to_b64",
-    "error_from_request",
 )
 
 from base64 import b64encode

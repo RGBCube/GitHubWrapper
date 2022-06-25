@@ -49,5 +49,5 @@ class RatelimitReached(GitHubError):
 
 
 def error_from_request(request: ClientResponse, /) -> BaseHTTPError:
-    # TODO: Make specific errrors
+    # TODO: Make specific errors
     return HTTPError(request)

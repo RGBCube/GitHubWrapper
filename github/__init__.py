@@ -32,3 +32,4 @@ __copyright__ = "Copyright (c) 2022-present VarMonke, sudosnok & contributors"
 from .errors import *
 from .internals import *
 from .objects import *
+from . import utils
