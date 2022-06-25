@@ -202,7 +202,6 @@ class HTTPClient:
             if 200 <= request.status <= 299:
                 return await request.json()
 
-            print(await request.json())
             raise error_from_request(request)
 
     # === ROUTES === #
