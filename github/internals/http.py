@@ -94,7 +94,7 @@ class HTTPClient:
     _last_ping: float
     _latency: float
 
-    def __new__(cls, **kwargs) -> Awaitable[HTTPClient]:
+    def __new__(cls, **kwargs: Any) -> Awaitable[HTTPClient]:
         # Basically async def __init__
         return cls.__async_init(**kwargs)
 
@@ -182,22 +182,18 @@ class HTTPClient:
         remaining = self._rates.remaining
         return remaining is not None and remaining < 2
 
-    @property
-    def latency(self) -> Awaitable[float]:
-        async def inner() -> float:
-            last_ping = self._last_ping
+    async def latency(self) -> float:
+        last_ping = self._last_ping
 
-            # If there was no ping or the last ping was more than 5 seconds ago.
-            if not last_ping or time.monotonic() > last_ping + 5 or self.is_ratelimited:
-                self._last_ping = time.monotonic()
+        # If there was no ping or the last ping was more than 5 seconds ago.
+        if not last_ping or time.monotonic() > last_ping + 5 or self.is_ratelimited:
+            self._last_ping = time.monotonic()
 
-                start = time.monotonic()
-                await self.request("GET", "/")
-                self._latency = time.monotonic() - start
+            start = time.monotonic()
+            await self.request("GET", "/")
+            self._latency = time.monotonic() - start
 
-            return self._latency
-
-        return inner()
+        return self._latency
 
     async def request(
         self, method: Literal["GET", "POST", "PUT", "DELETE", "PATCH"], path: str, /, **kwargs: Any
