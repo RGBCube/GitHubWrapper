@@ -20,7 +20,7 @@ class BaseHTTPError(GitHubError):
 
 
 class HTTPError(BaseHTTPError):
-    """Raised when an HTTP request doesn't respond with a successfull code."""
+    """Raised when an HTTP request doesn't respond with a successful code."""
 
     def __init__(self, response: ClientResponse, /) -> None:
         self.method = response.method
@@ -30,7 +30,7 @@ class HTTPError(BaseHTTPError):
 
     def __str__(self) -> str:
         return (
-            f"An HTTP error with the code {self.code} has occured while trying to do a"
+            f"An HTTP error with the code {self.code} has occurred while trying to do a"
             f" {self.method} request to the URL {self.url}"
         )
 

@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
     from ..objects import File
-    from ..types import SecurtiyAndAnalysis
+    from ..types import SecurityAndAnalysis
 
 
 log = logging.getLogger("github")
@@ -371,7 +371,7 @@ class HTTPClient:
         homepage: Optional[str] = None,
         private: Optional[bool] = None,
         visibility: Optional[Literal["public", "private", "internal"]] = None,
-        security_and_analysis: Optional[SecurtiyAndAnalysis] = None,
+        security_and_analysis: Optional[SecurityAndAnalysis] = None,
         has_issues: Optional[bool] = None,
         has_projects: Optional[bool] = None,
         has_wiki: Optional[bool] = None,

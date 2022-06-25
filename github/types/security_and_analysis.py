@@ -1,4 +1,4 @@
-__all__ = ("SecurtiyAndAnalysis",)
+__all__ = ("SecurityAndAnalysis",)
 
 from typing import TYPE_CHECKING, Literal, TypedDict
 
@@ -18,7 +18,7 @@ class SecretScanningPushProtection(TypedDict):
     status: Literal["enabled", "disabled"]
 
 
-class SecurtiyAndAnalysis(TypedDict):
+class SecurityAndAnalysis(TypedDict):
     advanced_security: NotRequired[AdvancedSecurity]
     secret_scanning: NotRequired[SecretScanning]
     secret_scanning_push_protection: NotRequired[SecretScanningPushProtection]

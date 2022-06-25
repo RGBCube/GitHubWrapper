@@ -19,7 +19,7 @@ def human_readable_time_until(td: timedelta, /) -> str:
     hours, seconds = divmod(seconds, 3600)
     minutes, seconds = divmod(seconds, 60)
 
-    return f"{hours} hours, {minutes} minues, {seconds} seconds"
+    return f"{hours} hours, {minutes} minutes, {seconds} seconds"
 
 
 def str_to_datetime(time: Optional[str], /) -> Optional[datetime]:
