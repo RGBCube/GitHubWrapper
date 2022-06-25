@@ -9,7 +9,7 @@ import time
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Awaitable, Dict, List, Literal, NamedTuple, Optional, Union
 
-from aiohttp import ClientSession, TraceConfig, __version__ as aiohttp_verrsion
+from aiohttp import ClientSession, TraceConfig, __version__ as aiohttp_version
 
 from ..errors import error_from_request
 from ..utils import human_readable_time_until
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 log = logging.getLogger("github")
 
 
-class Ratelimits(NamedTuple):
+class RateLimits(NamedTuple):
     remaining: Optional[int]
     used: Optional[int]
     total: Optional[int]
@@ -39,7 +39,7 @@ class Ratelimits(NamedTuple):
 # Make a good paginator
 # Make objects for all API Types
 # Make the requests return TypedDicts with those objects
-# Make specific errrors
+# Make specific errors
 # Make route /users/{username}/hovercard
 # Make it so an error gets raised when the cooldown is reached
 
@@ -90,7 +90,7 @@ class Ratelimits(NamedTuple):
 
 class HTTPClient:
     __session: ClientSession
-    _rates: Ratelimits
+    _rates: RateLimits
     _last_ping: float
     _latency: float
 
@@ -113,10 +113,10 @@ class HTTPClient:
         headers.setdefault(
             "User-Agent",
             "GitHub-API-Wrapper (https://github.com/Varmonke/GitHub-API-Wrapper) @"
-            f" 2.0.0a CPython/{platform.python_version()} aiohttp/{aiohttp_verrsion}",
+            f" 2.0.0a CPython/{platform.python_version()} aiohttp/{aiohttp_version}",
         )
 
-        self._rates = Ratelimits(None, None, None, None, None)
+        self._rates = RateLimits(None, None, None, None, None)
         self.__headers = headers
         self.__auth = auth
 
@@ -136,7 +136,9 @@ class HTTPClient:
                     f" {params.url}, method: {params.method})"
                 )
 
-                # TODO: I get about 3-4 hours of cooldown this might not be a good idea, might make this raise an error instead.
+                # TODO: I get about 3-4 hours of cooldown
+                # this might not be a good idea, might make
+                # this raise an error instead.
                 await asyncio.sleep(
                     max((self._rates.reset_time - datetime.now(timezone.utc)).total_seconds(), 0)
                 )
@@ -148,7 +150,7 @@ class HTTPClient:
             """After-request hook to adjust remaining requests on this time frame."""
             headers = params.response.headers
 
-            self._rates = Ratelimits(
+            self._rates = RateLimits(
                 int(headers["X-RateLimit-Remaining"]),
                 int(headers["X-RateLimit-Used"]),
                 int(headers["X-RateLimit-Limit"]),
@@ -437,7 +439,7 @@ class HTTPClient:
     async def disable_automated_security_fixes_for_repo(self, *, owner: str, repo: str):
         return await self.request("DELETE", f"/repos/{owner}/{repo}/automated-security-fixes")
 
-    async def list_codeowners_erros_for_repo(
+    async def list_codeowners_errors_for_repo(
         self, *, owner: str, repo: str, ref: Optional[str] = None
     ):
         params = {}
