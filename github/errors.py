@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-__all__ = ("GitHubError", "BaseHTTPError", "HTTPError", "RatelimitReached")
+__all__ = ("GitHubError", "BaseHTTPError", "HTTPError", "RatelimitReached", "error_from_request")
 
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
@@ -46,3 +46,7 @@ class RatelimitReached(GitHubError):
             "The ratelimit has been reached. You can try again in"
             f" {human_readable_time_until(datetime.now(timezone.utc) - self.reset_time)}"
         )
+
+def error_from_request(request: ClientResponse, /) -> BaseHTTPError:
+    # TODO: Make specific errrors
+    return HTTPError(request)

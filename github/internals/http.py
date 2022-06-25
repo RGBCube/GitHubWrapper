@@ -9,10 +9,10 @@ import time
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Awaitable, Dict, List, Literal, NamedTuple, Optional, Union
 
-from aiohttp import ClientSession, TraceConfig
+from aiohttp import ClientSession, TraceConfig, __version__ as aiohttp_verrsion
 
-from .. import __version__
-from ..utils import error_from_request, human_readable_time_until
+from ..utils import human_readable_time_until
+from ..errors import error_from_request
 
 if TYPE_CHECKING:
     from types import SimpleNamespace
@@ -112,7 +112,7 @@ class HTTPClient:
         headers.setdefault(
             "User-Agent",
             "GitHub-API-Wrapper (https://github.com/Varmonke/GitHub-API-Wrapper) @"
-            f" {__version__} CPython/{platform.python_version()} aiohttp/{__version__}",
+            f" 2.0.0a CPython/{platform.python_version()} aiohttp/{aiohttp_verrsion}",
         )
 
         self._rates = Ratelimits(None, None, None, None, None)
@@ -202,6 +202,7 @@ class HTTPClient:
             if 200 <= request.status <= 299:
                 return await request.json()
 
+            print(await request.json())
             raise error_from_request(request)
 
     # === ROUTES === #

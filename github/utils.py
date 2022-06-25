@@ -11,8 +11,6 @@ __all__ = (
 from base64 import b64encode
 from typing import TYPE_CHECKING, Optional
 
-from .errors import HTTPError
-
 if TYPE_CHECKING:
     from datetime import datetime, timedelta
 
@@ -39,8 +37,3 @@ def repr_dt(time: datetime, /) -> str:
 
 def bytes_to_b64(content: str, /) -> str:
     return b64encode(content.encode("utf-8")).decode("ascii")
-
-
-def error_from_request(request: ClientResponse, /) -> BaseHTTPError:
-    # TODO: Make specific errrors
-    return HTTPError(request)
