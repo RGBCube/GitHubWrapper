@@ -120,7 +120,9 @@ def generate(
             typed_dict = [f"class {obj_title}(TypedDict{total}):"]
 
             for key, value in obj_properties.items():
-                extras, param_annotation = generate(value, title=key.capitalize(), no_comments=no_comments)
+                extras, param_annotation = generate(
+                    value, title=key.capitalize(), no_comments=no_comments
+                )
                 result.append(extras)
 
                 if key not in obj.get("required", []):
