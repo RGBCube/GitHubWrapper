@@ -69,7 +69,10 @@ def generate(
 
                     if len(union_list) == 1:
                         text, target = inner_generate(
-                            union_list[0], _title=_title, _no_examples=_no_examples, _no_formats=_no_formats
+                            union_list[0],
+                            _title=_title,
+                            _no_examples=_no_examples,
+                            _no_formats=_no_formats,
                         )
                         dependencies.append(text)
                         param_type = f"Optional[{target}]"
