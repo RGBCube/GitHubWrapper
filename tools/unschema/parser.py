@@ -1,155 +1,189 @@
 from __future__ import annotations
 
-from typing import Iterable, Tuple
+from typing import Tuple  # , Any
 
 types = {
     "string": "str",
-    "integer": "int",
     "number": "float",
+    "integer": "int",
     "boolean": "bool",
     "object": "dict",
     "array": "list",
     "null": "None",
 }
 
-untypes = {v: k for k, v in types.items()}
+
+# # Used for debugging
+# class AppendPrint(list):
+#     def append(self, obj: Any) -> None:
+#         if obj:
+#             print(obj)
+#         super().append(obj)
 
 
-def unspace(s: str) -> str:
-    return s.replace(" ", "")
+def generate_typed_dicts_from_json_schema(
+    obj: dict, /, *, title: str = "GeneratedObject", no_comments: bool = False
+) -> Tuple[str, str]:  # sourcery skip: low-code-quality
+    """Makes TypedDict from a JSON Schema object.
 
+    Arguments:
+        obj: JSON Schema dict.
+        title: The title of the result.
+        no_comments: If True, no comments will be added.
 
-def mklist(s: Iterable) -> str:
-    return f"[{', '.join(s)}]"
+    Returns:
+        The generated TypedDicts, the result values name and the comments.
+    """
+    # The other TypedDicts
+    result = []
 
+    # The real annotation
+    annotation: str
 
-def generate(
-    _schema: dict,
-    /,
-    *,
-    no_examples: bool = False,
-    no_formats: bool = False,
-    title: str = "GeneratedObject",
-) -> str:
-    def inner_generate(
-        schema: dict,
-        /,
-        *,
-        _no_examples: bool = no_examples,
-        _no_formats: bool = no_formats,
-        _title: str = title,
-    ) -> Tuple[str, str]:  # sourcery skip: low-code-quality
+    obj_type = obj.get("type")
 
-        # GeneratedObject = Union[..., ..., ...]
-        if objects := schema.get("oneOf"):
-            text = []
+    # allOf, anyOf, oneOf, (not)?
+    if not obj_type:
+        # Treating oneOf as allOf, since is kinda the
+        # same and there isn't a way to type it in Python
+        if objs := obj.get("anyOf") or obj.get("oneOf"):
             union_items = []
-
-            for item_schema in objects:
-                generated_text, union_item = inner_generate(item_schema)
-
-                text.append(generated_text)
-                union_items.append(union_item)
-
-            text.append(f"{_title} = Union{mklist(union_items)}")
-            return "\n\n".join(_title), _title
-        del objects
-
-        # class GeneratedObject(TypedDict):
-        if (object_type := schema["type"]) == untypes["dict"]:
-            _title = unspace(schema["title"])
-
-            dependencies = []
-            current = [f'class {_title}(TypedDict):\n    """{schema["description"]}"""']
-
-            for key, value in schema["properties"].items():
-                com = ""
-                if union_list := value.get("anyOf"):
-                    union_list.remove({"type": "null"})
-
-                    if len(union_list) == 1:
-                        text, target = inner_generate(
-                            union_list[0],
-                            _title=_title,
-                            _no_examples=_no_examples,
-                            _no_formats=_no_formats,
-                        )
-                        dependencies.append(text)
-                        param_type = f"Optional[{target}]"
-
-                    else:
-                        union_items = []
-
-                        for item_schema in union_list:
-                            generated_text, union_item = generate(item_schema, title=_title)
-
-                            dependencies.append(generated_text)
-                            union_items.append(union_item)
-
-                        dependencies.append(f"{_title} = Union{mklist(union_items)}")
-
-                        param_type = f"Optional[{_title}]"
-
-                elif isinstance(value_type := value["type"], str):
-                    param_type = types[value_type]
-
-                elif isinstance(value_type, list):
-                    combiner = "Union"
-                    contents = []
-
-                    for type in value_type:
-                        if type == untypes["None"]:
-                            combiner = "Optional"
-                        else:
-                            contents.append(types[type])
-
-                    param_type = f"{combiner}{mklist(contents)}"
-
-                elif isinstance(value_type, dict):
-                    text, param_type = inner_generate(value)
-                    dependencies.append(text)
-
+            optional = False
+            for obj_schema in objs:
+                if obj_schema["type"] == "null":
+                    optional = True
                 else:
-                    param_type = f"Unknown[{value_type}]"
-                    com = "# "
+                    extras, target = generate_typed_dicts_from_json_schema(
+                        obj_schema, title=title, no_comments=no_comments
+                    )
+                    result.append(extras)
+                    union_items.append(target)
 
-                if key not in schema["required"]:
-                    param_type = f"NotRequired[{param_type}]"
-
-                eg = (
-                    ""
-                    if no_examples
-                    else f"    # example: {mklist(str(eg) for eg in egs)[1:-1]}\n"
-                    if (egs := value.get("examples"))
-                    else ""
-                )
-
-                fmt = (
-                    ""
-                    if no_formats
-                    else f"    # format: {fmt}\n"
-                    if (fmt := value.get("format"))
-                    else ""
-                )
-
-                sep = "\n" if eg or fmt else ""
-
-                current.append(f"{sep}{eg}{fmt}    {com}{key}: {param_type}")
-
-            dependencies.append("\n".join(current))
-            result = "\n\n".join(dependencies[:-1]) + "\n\n\n" + dependencies[-1]
-
-            return result, _title
-
-        # GeneratedObject = List[...]
-        elif isinstance(object_type, list):
-            generated, target = inner_generate(
-                schema["items"], _title=_title, _no_examples=_no_examples, _no_formats=_no_formats
-            )
-            return f"{generated}\n\n{_title} = List[{target}]", _title
-
+            annotation = f"{'Optional' if optional else 'Union'}[{', '.join(union_items)}]"
         else:
-            print("Unknown/Unimplemented Object Type:", object_type)
-            return "", ""
+            annotation = "Any"
 
-    return inner_generate(_schema)[0]
+    # Union for parameters
+    elif isinstance(obj_type, list):
+        union_items = []
+        is_optional = False
+
+        for obj_type_item in obj_type:
+            if obj_type_item == "null":
+                is_optional = True
+            else:
+                union_items.append(types[obj_type_item])
+
+        annotation = f"{'Optional' if is_optional else 'Optional'}[{', '.join(union_items)}]"
+
+    elif obj_type == "boolean":
+        annotation = "bool"
+
+    elif obj_type == "null":
+        annotation = "None"
+
+    elif obj_type == "string":
+        if not no_comments:
+            if obj_min_len := obj.get("minLength"):
+                result.append(f"    # Minimum length: {obj_min_len}")
+            if obj_max_len := obj.get("maxLength"):
+                result.append(f"    # Maximum length: {obj_max_len}")
+            if obj_pattern := obj.get("pattern"):
+                result.append(f"    # Pattern: {obj_pattern!r}")
+
+        annotation = "str"
+
+    elif obj_type in {"integer", "number"}:
+        if not no_comments:
+            if obj_multiple := obj.get("multipleOf"):
+                result.append(f"    # Multiple of: {obj_multiple}")
+            if obj_minimum := obj.get("minimum"):
+                result.append(f"    # Minimum (x >= N): {obj_minimum}")
+            if obj_exclusive_minimum := obj.get("exclusiveMinimum"):
+                result.append(f"    # Exclusive minimum (x > N): {obj_exclusive_minimum}")
+            if obj_maximum := obj.get("maximum"):
+                result.append(f"    # Maximum (x <= N): {obj_maximum}")
+            if obj_exclusive_maximum := obj.get("exclusiveMaximum"):
+                result.append(f"    # Exclusive maximum (x < N): {obj_exclusive_maximum}")
+            if any([obj_minimum, obj_exclusive_minimum, obj_maximum, obj_exclusive_maximum]):
+                result.append("     # x = the variable, N = the min/max")
+
+        annotation = "int" if obj_type == "integer" else "float"
+
+    elif obj_type == "object":
+        # TODO: add support for patternProperties, unevaluatedProperties,
+        # propertyNames, minProperties, maxProperties
+
+        if obj_properties := obj.get("properties"):
+            # TODO: make it so the extra properties are typed instead of Any, somehow
+            total = ", total=False" if obj.get("additionalProperties") else ""
+
+            annotation = obj_title = obj.get("title", title).replace(" ", "")
+            result.append(f"class {obj_title}(TypedDict{total}):")
+
+            for key, value in obj_properties.items():
+                extras, param_annotation = generate_typed_dicts_from_json_schema(
+                    value, title=key.capitalize(), no_comments=no_comments
+                )
+                result.append(extras)
+                if param_annotation not in obj.get("required", []):
+                    param_annotation = f"NotRequired[{param_annotation}]"
+
+                if not no_comments:
+                    result.extend(
+                        [
+                            f"    # Format: {fmt}" if (fmt := value.get("format")) else "",
+                            f"    # Example: {', '.join(str(ex) for ex in exs)}"
+                            if (exs := value.get("examples"))
+                            else "",
+                        ]
+                    )
+
+                result.append(f"    {key}: {param_annotation}")
+        else:
+            annotation = "dict"
+
+    elif obj_type == "array":
+        # TODO: add support for contains, minContains,
+        # maxContains, minLength, maxLength, uniqueItems
+
+        if obj_items := obj.get("items"):
+            extras, target = generate_typed_dicts_from_json_schema(
+                obj_items, no_comments=no_comments
+            )
+            result.append(extras)
+            annotation = f"List[{target}]"
+
+        elif obj_prefix_items := obj.get("prefixItems"):
+            tuple_annotation = []
+            for item in obj_prefix_items:
+                (
+                    extras,
+                    target,
+                ) = generate_typed_dicts_from_json_schema(item, no_comments=no_comments)
+                result.append(extras)
+                tuple_annotation.append(target)
+
+            if extra_item_type := obj.get("items"):
+                if extra_item_type is not True:
+                    extras, extra_type = generate_typed_dicts_from_json_schema(
+                        extra_item_type, no_comments=no_comments
+                    )
+                    result.append(extras)
+                    if not no_comments:
+                        result.append(
+                            f"    # The extra items for the tuple are typed as: {extra_type}"
+                        )
+
+                tuple_annotation.append("...")
+
+            annotation = f"Tuple[{', '.join(tuple_annotation)}]"
+        else:
+            annotation = "list"
+
+    else:
+        annotation = "Any"
+
+    result = [i for i in result if i]
+
+    return "\n".join(result), annotation

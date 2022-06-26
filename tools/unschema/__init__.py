@@ -1,1 +1,1 @@
-from .parser import generate
+from .parser import generate_typed_dicts_from_json_schema
