@@ -129,12 +129,15 @@ def generate(
                     param_annotation = f"NotRequired[{param_annotation}]"
 
                 if not no_comments:
+                    examples = (', '.join(str(ex) for ex in exs)).replace("\n", "\\n") if (exs := value.get("examples")) else ""
+
+                    if (example := examples[:70]) != examples:
+                        examples = f"{example}[...]"
+
                     typed_dict.extend(
                         [
                             f"    # Format: {fmt}" if (fmt := value.get("format")) else "",
-                            f"    # Example: {', '.join(str(ex) for ex in exs)}"
-                            if (exs := value.get("examples"))
-                            else "",
+                            f"    # Example: {examples}"
                         ]
                     )
 
