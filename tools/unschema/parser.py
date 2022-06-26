@@ -126,7 +126,8 @@ def generate_typed_dicts_from_json_schema(
                     value, title=key.capitalize(), no_comments=no_comments
                 )
                 result.append(extras)
-                if param_annotation not in obj.get("required", []):
+
+                if key not in obj.get("required", []):
                     param_annotation = f"NotRequired[{param_annotation}]"
 
                 if not no_comments:
