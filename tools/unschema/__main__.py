@@ -57,11 +57,11 @@ else:
 
     end = time.perf_counter() - start
 
-    exit_code = os.system(f"unimport {to} --gitignore -r --ignore-init; isort {to}; black {to}; flynt {to} -tc", )
+    exit_code = os.system(
+        f"unimport {to} --gitignore -r --ignore-init; isort {to}; black {to}; flynt {to} -tc",
+    )
 
     if exit_code != 0:
         print(f"Formatting failed with exit code {exit_code}")
 
 print(f"\n\nSuccess! Finished in {end*1000:.3} milliseconds")
-
-
