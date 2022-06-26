@@ -46,7 +46,7 @@ def generate(
             union_items = []
 
             for item_schema in objects:
-                generated_text, union_item = generate(item_schema, title=_title)
+                generated_text, union_item = inner_generate(item_schema)
 
                 text.append(generated_text)
                 union_items.append(union_item)
@@ -63,7 +63,31 @@ def generate(
             current = [f'class {_title}(TypedDict):\n    """{schema["description"]}"""']
 
             for key, value in schema["properties"].items():
-                if isinstance(value_type := value["type"], str):
+                com = ""
+                if union_list := value.get("anyOf"):
+                    union_list.remove({"type": "null"})
+
+                    if len(union_list) == 1:
+                        text, target = inner_generate(
+                            union_list[0], _title=_title, _no_examples=_no_examples, _no_formats=_no_formats
+                        )
+                        dependencies.append(text)
+                        param_type = f"Optional[{target}]"
+
+                    else:
+                        union_items = []
+
+                        for item_schema in union_list:
+                            generated_text, union_item = generate(item_schema, title=_title)
+
+                            dependencies.append(generated_text)
+                            union_items.append(union_item)
+
+                        dependencies.append(f"{_title} = Union{mklist(union_items)}")
+
+                        param_type = f"Optional[{_title}]"
+
+                elif isinstance(value_type := value["type"], str):
                     param_type = types[value_type]
 
                 elif isinstance(value_type, list):
@@ -79,14 +103,12 @@ def generate(
                     param_type = f"{combiner}{mklist(contents)}"
 
                 elif isinstance(value_type, dict):
-                    text, target = inner_generate(
-                        value_type, _title=key, _no_examples=_no_examples, _no_formats=_no_formats
-                    )
+                    text, param_type = inner_generate(value)
                     dependencies.append(text)
-                    param_type = target
 
                 else:
                     param_type = f"Unknown[{value_type}]"
+                    com = "# "
 
                 if key not in schema["required"]:
                     param_type = f"NotRequired[{param_type}]"
@@ -109,8 +131,6 @@ def generate(
 
                 sep = "\n" if eg or fmt else ""
 
-                com = "# " if param_type.startswith("Unknown") else ""
-
                 current.append(f"{sep}{eg}{fmt}    {com}{key}: {param_type}")
 
             dependencies.append("\n".join(current))
@@ -119,11 +139,11 @@ def generate(
             return result, _title
 
         # GeneratedObject = List[...]
-        elif object_type == untypes["list"]:
+        elif isinstance(object_type, list):
             generated, target = inner_generate(
                 schema["items"], _title=_title, _no_examples=_no_examples, _no_formats=_no_formats
             )
-            return f"{generated}\n\n\n{_title} = List[{target}]", _title
+            return f"{generated}\n\n{_title} = List[{target}]", _title
 
         else:
             print("Unknown/Unimplemented Object Type:", object_type)
