@@ -119,7 +119,7 @@ def generate_typed_dicts_from_json_schema(
             total = ", total=False" if obj.get("additionalProperties") else ""
 
             annotation = obj_title = obj.get("title", title).replace(" ", "")
-            result.append(f"class {obj_title}(TypedDict{total}):")
+            typed_dict = [f"class {obj_title}(TypedDict{total}):"]
 
             for key, value in obj_properties.items():
                 extras, param_annotation = generate_typed_dicts_from_json_schema(
@@ -130,7 +130,7 @@ def generate_typed_dicts_from_json_schema(
                     param_annotation = f"NotRequired[{param_annotation}]"
 
                 if not no_comments:
-                    result.extend(
+                    typed_dict.extend(
                         [
                             f"    # Format: {fmt}" if (fmt := value.get("format")) else "",
                             f"    # Example: {', '.join(str(ex) for ex in exs)}"
@@ -139,7 +139,9 @@ def generate_typed_dicts_from_json_schema(
                         ]
                     )
 
-                result.append(f"    {key}: {param_annotation}")
+                typed_dict.append(f"    {key}: {param_annotation}")
+
+            result.extend(typed_dict)
         else:
             annotation = "dict"
 

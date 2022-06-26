@@ -6,17 +6,6 @@ if TYPE_CHECKING:
     from typing_extensions import NotRequired
 
 
-class Repository(TypedDict):
-    # Example: 42
-    id: NotRequired[int]
-    # Example: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
-    node_id: NotRequired[str]
-    # Example: Team Environment
-    name: NotRequired[str]
-    # Example: octocat/Hello-World
-    full_name: NotRequired[str]
-
-
 class LicenseSimple(TypedDict):
     # Example: mit
     key: NotRequired[str]
@@ -31,7 +20,6 @@ class LicenseSimple(TypedDict):
     node_id: NotRequired[str]
     # Format: uri
     html_url: NotRequired[str]
-    license: NotRequired[Optional[LicenseSimple]]
 
 
 class SimpleUser(TypedDict):
@@ -82,8 +70,6 @@ class SimpleUser(TypedDict):
     site_admin: NotRequired[bool]
     # Example: "2020-07-09T00:17:55Z"
     starred_at: NotRequired[str]
-    organization: NotRequired[Optional[SimpleUser]]
-    forks: NotRequired[int]
 
 
 class Permissions(TypedDict):
@@ -92,7 +78,6 @@ class Permissions(TypedDict):
     triage: NotRequired[bool]
     push: NotRequired[bool]
     maintain: NotRequired[bool]
-    permissions: NotRequired[Permissions]
 
 
 class SimpleUser(TypedDict):
@@ -143,6 +128,21 @@ class SimpleUser(TypedDict):
     site_admin: NotRequired[bool]
     # Example: "2020-07-09T00:17:55Z"
     starred_at: NotRequired[str]
+
+
+class Repository(TypedDict):
+    # Example: 42
+    id: NotRequired[int]
+    # Example: MDEwOlJlcG9zaXRvcnkxMjk2MjY5
+    node_id: NotRequired[str]
+    # Example: Team Environment
+    name: NotRequired[str]
+    # Example: octocat/Hello-World
+    full_name: NotRequired[str]
+    license: NotRequired[Optional[LicenseSimple]]
+    organization: NotRequired[Optional[SimpleUser]]
+    forks: NotRequired[int]
+    permissions: NotRequired[Permissions]
     owner: NotRequired[SimpleUser]
     private: NotRequired[bool]
     # Format: uri
