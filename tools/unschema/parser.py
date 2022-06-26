@@ -132,7 +132,9 @@ def generate(
                     if examples := value.get("examples"):
                         s = "" if len(examples) == 1 else "s"
 
-                        examples = ", ".join([str(example) for example in examples]).replace("\n", "\\n")
+                        examples = ", ".join([str(example) for example in examples]).replace(
+                            "\n", "\\n"
+                        )
 
                         if (examples_short := examples[:70]) != examples:
                             examples = f"{examples_short}[...]"
@@ -140,10 +142,7 @@ def generate(
                         examples = f"    # Example{s}: {examples}" if examples else ""
 
                     typed_dict.extend(
-                        [
-                            f"    # Format: {fmt}" if (fmt := value.get("format")) else "",
-                            examples
-                        ]
+                        [f"    # Format: {fmt}" if (fmt := value.get("format")) else "", examples]
                     )
 
                 typed_dict.append(f"    {key}: {param_annotation}")
