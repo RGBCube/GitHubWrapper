@@ -3,7 +3,7 @@ import os
 import time
 from argparse import ArgumentParser
 
-from .parser import generate_typed_dicts_from_json_schema
+from .parser import generate
 
 parser = ArgumentParser(description="Generate TypedDicts from a json schema.")
 parser.add_argument("-f", "--from", required=True, help="The json schema to generate from.")
@@ -27,7 +27,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 with open(args.__getattribute__("from")) as f:
-    generated = generate_typed_dicts_from_json_schema(json.load(f), no_comments=args.no_comments)
+    generated = generate(json.load(f), no_comments=args.no_comments)
 
 start = time.perf_counter()
 

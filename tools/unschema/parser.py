@@ -21,7 +21,7 @@ types = {
 #         super().append(obj)
 
 
-def generate_typed_dicts_from_json_schema(
+def generate(
     obj: dict, /, *, title: str = "GeneratedObject", no_comments: bool = False
 ) -> Tuple[str, str]:  # sourcery skip: low-code-quality
     """Makes TypedDict from a JSON Schema object.
@@ -53,9 +53,7 @@ def generate_typed_dicts_from_json_schema(
                 if obj_schema["type"] == "null":
                     optional = True
                 else:
-                    extras, target = generate_typed_dicts_from_json_schema(
-                        obj_schema, title=title, no_comments=no_comments
-                    )
+                    extras, target = generate(obj_schema, title=title, no_comments=no_comments)
                     result.append(extras)
                     union_items.append(target)
 
@@ -122,9 +120,7 @@ def generate_typed_dicts_from_json_schema(
             typed_dict = [f"class {obj_title}(TypedDict{total}):"]
 
             for key, value in obj_properties.items():
-                extras, param_annotation = generate_typed_dicts_from_json_schema(
-                    value, title=key.capitalize(), no_comments=no_comments
-                )
+                extras, param_annotation = generate(value, title=key.capitalize(), no_comments=no_comments)
                 result.append(extras)
 
                 if key not in obj.get("required", []):
@@ -151,9 +147,7 @@ def generate_typed_dicts_from_json_schema(
         # maxContains, minLength, maxLength, uniqueItems
 
         if obj_items := obj.get("items"):
-            extras, target = generate_typed_dicts_from_json_schema(
-                obj_items, no_comments=no_comments
-            )
+            extras, target = generate(obj_items, no_comments=no_comments)
             result.append(extras)
             annotation = f"List[{target}]"
 
@@ -163,15 +157,13 @@ def generate_typed_dicts_from_json_schema(
                 (
                     extras,
                     target,
-                ) = generate_typed_dicts_from_json_schema(item, no_comments=no_comments)
+                ) = generate(item, no_comments=no_comments)
                 result.append(extras)
                 tuple_annotation.append(target)
 
             if extra_item_type := obj.get("items"):
                 if extra_item_type is not True:
-                    extras, extra_type = generate_typed_dicts_from_json_schema(
-                        extra_item_type, no_comments=no_comments
-                    )
+                    extras, extra_type = generate(extra_item_type, no_comments=no_comments)
                     result.append(extras)
                     if not no_comments:
                         result.append(
