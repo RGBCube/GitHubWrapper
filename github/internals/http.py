@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
     from ..objects import File
-    from ..types import SecurityAndAnalysis
+    from ..types import Author, Committer, OptionalAuthor, OptionalCommitter, SecurityAndAnalysis
 
 
 log = logging.getLogger("github")
@@ -86,7 +86,7 @@ class RateLimits(NamedTuple):
 # Rate limit
 # Reactions
 # Releases
-# Repositories               DONE(1st part)
+# Repositories               DONE
 # SCIM
 # Search
 # Teams
@@ -712,6 +712,180 @@ class HTTPClient:
 
         return await self.request("GET", f"/users/{username}/repos", params=params)
 
+    async def list_repo_autolinks(self, *, owner: str, repo: str, page: Optional[int] = None):
+        params = {}
+
+        if page:
+            params["page"] = page
+
+        return await self.request("GET", f"/repos/{owner}/{repo}/autolinks", params=params)
+
+    async def create_autolink_reference_for_repo(
+        self, *, owner: str, repo: str, key_prefix: str, url_template: str
+    ):
+        return await self.request(
+            "POST",
+            f"/repos/{owner}/{repo}/autolinks",
+            json={"key_prefix": key_prefix, "url_template": url_template},
+        )
+
+    async def get_autolink_reference_for_repo(self, *, owner: str, repo: str, autolink_id: str):
+        return await self.request("GET", f"/repos/{owner}/{repo}/autolinks/{autolink_id}")
+
+    async def delete_autolink_reference_for_repo(self, *, owner: str, repo: str, autolink_id: str):
+        return await self.request("DELETE", f"/repos/{owner}/{repo}/autolinks/{autolink_id}")
+
+    async def get_repo_content(
+        self, *, owner: str, repo: str, path: str, ref: Optional[str] = None
+    ):
+        params = {}
+
+        if ref:
+            params["ref"] = ref
+
+        return await self.request("GET", f"/repos/{owner}/{repo}/contents/{path}", params=params)
+
+    async def create_or_update_repo_file_contents(
+        self,
+        *,
+        owner: str,
+        repo: str,
+        path: str,
+        message: str,
+        content: str,
+        sha: Optional[str] = None,
+        branch: Optional[str] = None,
+        committer: Optional[Committer] = None,
+        author: Optional[Author] = None,
+    ):
+        data = {
+            "message": message,
+            "content": content,
+        }
+
+        if sha:
+            data["sha"] = sha
+        if branch:
+            data["branch"] = branch
+        if committer:
+            data["committer"] = committer
+        if author:
+            data["author"] = author
+
+        return await self.request("PUT", f"/repos/{owner}/{repo}/contents/{path}", json=data)
+
+    async def delete_repo_file(
+        self,
+        *,
+        owner: str,
+        repo: str,
+        path: str,
+        message: str,
+        sha: str,
+        branch: Optional[str] = None,
+        committer: Optional[OptionalCommitter] = None,
+        author: Optional[OptionalAuthor] = None,
+    ):
+        data = {
+            "message": message,
+            "sha": sha,
+        }
+
+        if branch:
+            data["branch"] = branch
+        if committer:
+            data["committer"] = committer
+        if author:
+            data["author"] = author
+
+        return await self.request("DELETE", f"/repos/{owner}/{repo}/contents/{path}", json=data)
+
+    async def get_repo_readme(self, *, owner: str, repo: str):
+        return await self.request("GET", f"/repos/{owner}/{repo}/readme")
+
+    async def get_repo_readme_for_directory(
+        self, *, owner: str, repo: str, dir: str, ref: Optional[str] = None
+    ):
+        params = {}
+
+        if ref:
+            params["ref"] = ref
+
+        return await self.request("GET", f"/repos/{owner}/{repo}/readme/{dir}", params=params)
+
+    async def download_repo_archive(
+        self,
+        *,
+        owner: str,
+        repo: str,
+        archive_format: Literal["tarball", "zipball"],
+        ref: Optional[str] = None,
+    ):
+        params = {}
+
+        if ref:
+            params["ref"] = ref
+
+        return await self.request("GET", f"/repos/{owner}/{repo}/{archive_format}", params=params)
+
+    async def list_repo_forks(
+        self,
+        *,
+        owner: str,
+        repo: str,
+        sort: Optional[Literal["newest", "oldest", "stargazers", "watchers"]] = None,
+        per_page: Optional[int] = None,
+        page: Optional[int] = None,
+    ):
+        params = {}
+
+        if sort:
+            params["sort"] = sort
+        if per_page:
+            params["per_page"] = per_page
+        if page:
+            params["page"] = page
+
+        return await self.request("GET", f"/repos/{owner}/{repo}/forks", params=params)
+
+    async def create_repo_fork(self, *, owner: str, repo: str, organization: Optional[str] = None):
+        data = {}
+
+        if organization:
+            data["organization"] = organization
+
+        return await self.request("POST", f"/repos/{owner}/{repo}/forks", json=data)
+
+    async def enable_git_lfs_for_repo(self, *, owner: str, repo: str):
+        return await self.request("PUT", f"/repos/{owner}/{repo}/lfs")
+
+    async def disable_git_lfs_for_repo(self, *, owner: str, repo: str):
+        return await self.request("DELETE", f"/repos/{owner}/{repo}/lfs")
+
+    async def list_tag_protection_states_for_repo(self, *, owner: str, repo: str):
+        return await self.request("GET", f"/repos/{owner}/{repo}/tags/protection")
+
+    async def create_tag_protection_state_for_repo(
+        self,
+        *,
+        owner: str,
+        repo: str,
+        pattern: str,
+    ):
+        data = {}
+
+        if pattern:
+            data["pattern"] = pattern
+
+        return await self.request("POST", f"/repos/{owner}/{repo}/tags/protection", json=data)
+
+    async def delete_tag_protection_state_for_repo(
+        self, *, owner: str, repo: str, tag_protection_id: int
+    ):
+        return await self.request(
+            "DELETE", f"/repos/{owner}/{repo}/tags/protection/{tag_protection_id}"
+        )
+
     # === GISTS === #
 
     async def list_gists_for_authenticated_user(
@@ -892,7 +1066,7 @@ class HTTPClient:
     async def get_license(self, *, license: str):
         return await self.request("GET", f"/licenses/{license}")
 
-    async def get_license_for_repository(self, *, owner: str, repo: str):
+    async def get_license_for_repo(self, *, owner: str, repo: str):
         return await self.request("GET", f"/repos/{owner}/{repo}/license")
 
     # === GITIGNORE === #
