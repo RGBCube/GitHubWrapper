@@ -64,7 +64,7 @@ class RateLimits(NamedTuple):
 # Gitignore
 # Interactions
 # Issues
-# Licenses
+# Licenses                   DONE
 # Markdown
 # Meta
 # Metrics
@@ -831,3 +831,14 @@ class HTTPClient:
             params["page"] = page
 
         return await self.request("GET", f"/users/{username}/gists", params=params)
+
+    # === LICENSES === #
+
+    async def get_commonly_used_licenses(self):
+        return await self.request("GET", "/licenses")
+
+    async def get_license(self, *, license: str):
+        return await self.request("GET", f"/licenses/{license}")
+
+    async def get_license_for_repository(self, *, owner: str, repo: str):
+        return await self.request("GET", f"/repos/{owner}/{repo}/license")
