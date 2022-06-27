@@ -455,7 +455,7 @@ class HTTPClient:
 
         return await self.request("GET", f"/repos/{owner}/{repo}/codeowners/errors", params=params)
 
-    async def list_contributors_for_repo(
+    async def list_repo_contributors(
         self,
         *,
         owner: str,
@@ -475,7 +475,7 @@ class HTTPClient:
 
         return await self.request("GET", f"/repos/{owner}/{repo}/contributors", params=params)
 
-    async def create_dispatch_event_for_repo(
+    async def create_repo_dispatch_event(
         self, *, owner: str, repo: str, event_name: str, client_payload: Optional[str] = None
     ):
         data = {
@@ -487,10 +487,10 @@ class HTTPClient:
 
         return await self.request("POST", f"/repos/{owner}/{repo}/dispatches", json=data)
 
-    async def list_repo_languages_for_repo(self, *, owner: str, repo: str):
+    async def list_repo_languages(self, *, owner: str, repo: str):
         return await self.request("GET", f"/repos/{owner}/{repo}/languages")
 
-    async def list_tags_for_repo(
+    async def list_repo_tags(
         self, *, owner: str, repo: str, per_page: Optional[int] = None, page: Optional[int] = None
     ):
         params = {}
@@ -502,7 +502,7 @@ class HTTPClient:
 
         return await self.request("GET", f"/repos/{owner}/{repo}/tags", params=params)
 
-    async def list_teams_for_repo(
+    async def list_repo_teams(
         self, *, owner: str, repo: str, per_page: Optional[int] = None, page: Optional[int] = None
     ):
         params = {}
@@ -514,7 +514,7 @@ class HTTPClient:
 
         return await self.request("GET", f"/repos/{owner}/{repo}/teams", params=params)
 
-    async def get_all_topics_for_repo(
+    async def get_all_repo_topics(
         self, *, owner: str, repo: str, per_page: Optional[int] = None, page: Optional[int] = None
     ):
         params = {}
@@ -526,7 +526,7 @@ class HTTPClient:
 
         return await self.request("GET", f"/repos/{owner}/{repo}/topics", params=params)
 
-    async def replace_all_topics_for_repo(self, *, owner: str, repo: str, names: List[str]):
+    async def replace_all_repo_topics(self, *, owner: str, repo: str, names: List[str]):
         return await self.request("PUT", f"/repos/{owner}/{repo}/topics", json={"names": names})
 
     async def transfer_repo(
@@ -544,13 +544,13 @@ class HTTPClient:
     async def check_vulnerability_alerts_enabled_for_repo(self, *, owner: str, repo: str):
         return await self.request("GET", f"/repos/{owner}/{repo}/vulnerability-alerts")
 
-    async def enable_vulnerability_alerts_for_repo(self, *, owner: str, repo: str):
+    async def enable_repo_vulnerability_alerts(self, *, owner: str, repo: str):
         return await self.request("PUT", f"/repos/{owner}/{repo}/vulnerability-alerts")
 
-    async def disable_vulnerability_alerts_for_repo(self, *, owner: str, repo: str):
+    async def disable_repo_vulnerability_alerts(self, *, owner: str, repo: str):
         return await self.request("DELETE", f"/repos/{owner}/{repo}/vulnerability-alerts")
 
-    async def create_repo_using_template_repo(
+    async def create_repo_using_template(
         self,
         *,
         template_owner: str,
@@ -583,7 +583,7 @@ class HTTPClient:
 
         return await self.request("GET", "/repositories", params=params)
 
-    async def list_logged_in_user_repos(
+    async def list_repos_for_authenticated_user(
         self,
         *,
         visibility: Optional[Literal["all", "private", "public"]] = None,
@@ -619,7 +619,7 @@ class HTTPClient:
 
         return self.request("POST", "/user/repos", json=data)
 
-    async def create_repo(
+    async def create_repo_for_authenticated_user(
         self,
         *,
         name: str,
@@ -682,7 +682,7 @@ class HTTPClient:
 
         return await self.request("POST", "/user/repos", json=data)
 
-    async def list_user_repos(
+    async def list_repos_for_user(
         self,
         *,
         username: str,
@@ -711,7 +711,7 @@ class HTTPClient:
 
     # === GISTS === #
 
-    async def list_logged_in_user_gists(
+    async def list_gists_for_authenticated_user(
         self,
         *,
         since: Optional[str] = None,
@@ -797,7 +797,7 @@ class HTTPClient:
     async def delete_gist(self, *, gist_id: str):
         return await self.request("DELETE", f"/gists/{gist_id}")
 
-    async def list_commits_for_gist(
+    async def list_gist_commits(
         self, *, gist_id: str, per_page: Optional[int] = None, page: Optional[int] = None
     ):
         params = {}
@@ -809,7 +809,7 @@ class HTTPClient:
 
         return await self.request("GET", f"/gists/{gist_id}/commits", params=params)
 
-    async def list_forks_for_gist(
+    async def list_gist_forks(
         self, *, gist_id: str, per_page: Optional[int] = None, page: Optional[int] = None
     ):
         params = {}
@@ -824,7 +824,7 @@ class HTTPClient:
     async def fork_gist(self, *, gist_id: str):
         return await self.request("POST", f"/gists/{gist_id}/forks")
 
-    async def check_starred_for_gist(self, *, gist_id: str):
+    async def check_gist_is_starred(self, *, gist_id: str):
         return await self.request("GET", f"/gists/{gist_id}/star")
 
     async def star_gist(self, *, gist_id: str):
@@ -833,10 +833,10 @@ class HTTPClient:
     async def unstar_gist(self, *, gist_id: str):
         return await self.request("DELETE", f"/gists/{gist_id}/star")
 
-    async def get_revision_for_gist(self, *, gist_id: str, sha: str):
+    async def get_gist_revision(self, *, gist_id: str, sha: str):
         return await self.request("GET", f"/gists/{gist_id}/{sha}")
 
-    async def list_user_gists(
+    async def list_gists_for_user(
         self,
         *,
         username: str,
