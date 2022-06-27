@@ -55,7 +55,7 @@ class RateLimits(NamedTuple):
 # Commits
 # Dependabot
 # Dependency Graph
-# Deploy keys
+# Deploy keys                DONE
 # Deployments
 # Emojis                     DONE
 # Enterprise administration
@@ -863,3 +863,31 @@ class HTTPClient:
 
     async def get_code_of_conduct(self, *, key: str):
         return await self.request("GET", f"/codes_of_conduct/{key}")
+
+    # === DEPLOY KEYS === #
+
+    async def list_deploy_keys(self, *, owner: str, repo: str, per_page: Optional[int] = None, page: Optional[int] = None):
+        params = {}
+
+        if per_page:
+            params["per_page"] = per_page
+        if page:
+            params["page"] = page
+
+        return await self.request("GET", f"/repos/{owner}/{repo}/keys", params=params)
+
+    async def create_deploy_key(self, *, owner: str, repo: str, title: Optional[str] = None, key: str, read_only: Optional[bool] = None):
+        data = {"key": key}
+
+        if title:
+            data["title"] = title
+        if read_only:
+            data["read_only"] = read_only
+
+        return await self.request("POST", f"/repos/{owner}/{repo}/keys", data=data)
+
+    async def get_deploy_key(self, *, owner: str, repo: str, key_id: int):
+        return await self.request("GET", f"/repos/{owner}/{repo}/keys/{key_id}")
+
+    async def delete_deploy_key(self, *, owner: str, repo: str, key_id: int):
+        return await self.request("DELETE", f"/repos/{owner}/{repo}/keys/{key_id}")
