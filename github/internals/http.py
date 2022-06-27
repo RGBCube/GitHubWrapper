@@ -66,7 +66,7 @@ class RateLimits(NamedTuple):
 # Deployments
 # Emojis                     DONE
 # Enterprise administration
-# Gists                      DONE(1st part)
+# Gists                      DONE
 # Git database
 # Gitignore                  DONE
 # Interactions
@@ -854,6 +854,30 @@ class HTTPClient:
             params["page"] = page
 
         return await self.request("GET", f"/users/{username}/gists", params=params)
+
+    async def list_gist_comments(
+        self, *, gist_id: str, per_page: Optional[int] = None, page: Optional[int] = None
+    ):
+        params = {}
+
+        if per_page:
+            params["per_page"] = per_page
+        if page:
+            params["page"] = page
+
+        return await self.request("GET", f"/gists/{gist_id}/comments", params=params)
+
+    async def create_gist_comment(self, *, gist_id: str, body: str):
+        return await self.request("POST", f"/gists/{gist_id}/comments", json={"body": body})
+
+    async def get_gist_comment(self, *, gist_id: str, comment_id: str):
+        return await self.request("GET", f"/gists/{gist_id}/comments/{comment_id}")
+
+    async def update_gist_comment(self, *, gist_id: str, comment_id: str, body: str):
+        return await self.request("PATCH", f"/gists/{gist_id}/comments/{comment_id}", json={"body": body})
+
+    async def delete_gist_comment(self, *, gist_id: str, comment_id: str):
+        return await self.request("DELETE", f"/gists/{gist_id}/comments/{comment_id}")
 
     # === LICENSES === #
 
