@@ -174,8 +174,6 @@ class HTTPClient:
         async with self.__session.request(
             method, f"https://api.github.com{path}", **kwargs
         ) as request:
-            if 200 <= request.status <= 299:
-                return await request.json()
 
             headers = request.headers
 
@@ -188,6 +186,9 @@ class HTTPClient:
                 ),
                 datetime.now(timezone.utc),
             )
+
+            if 200 <= request.status <= 299:
+                return await request.json()
 
             raise error_from_request(request)
 
