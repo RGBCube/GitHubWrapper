@@ -32,6 +32,7 @@ class RateLimits(NamedTuple):
     reset_time: Optional[datetime]
     last_request: Optional[datetime]
 
+
 # ====== STYLE GUIDE ===== #
 # All route method names should be
 # The exact same from the GitHub API
@@ -254,11 +255,13 @@ class HTTPClient:
         return await self.request("GET", f"/users/{username}")
 
     async def get_context_info_for_user(
-            self,
-            *,
-            username: str,
-            subject_type: Optional[Literal["organization", "repository", "user", "pull_request"]] = None,
-            subject_id: Optional[int] = None,
+        self,
+        *,
+        username: str,
+        subject_type: Optional[
+            Literal["organization", "repository", "user", "pull_request"]
+        ] = None,
+        subject_id: Optional[int] = None,
     ):
         params = {}
 
@@ -874,7 +877,9 @@ class HTTPClient:
         return await self.request("GET", f"/gists/{gist_id}/comments/{comment_id}")
 
     async def update_gist_comment(self, *, gist_id: str, comment_id: str, body: str):
-        return await self.request("PATCH", f"/gists/{gist_id}/comments/{comment_id}", json={"body": body})
+        return await self.request(
+            "PATCH", f"/gists/{gist_id}/comments/{comment_id}", json={"body": body}
+        )
 
     async def delete_gist_comment(self, *, gist_id: str, comment_id: str):
         return await self.request("DELETE", f"/gists/{gist_id}/comments/{comment_id}")
