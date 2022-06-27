@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__all__ = ("generate",)
+
 from typing import Tuple  # , Any
 
 types = {
@@ -21,7 +23,7 @@ types = {
 #         super().append(obj)
 
 
-def generate(
+def _generate(
     obj: dict, /, *, title: str = "GeneratedObject", no_comments: bool = False
 ) -> Tuple[str, str]:  # sourcery skip: low-code-quality
     """Makes TypedDict from a JSON Schema object.
@@ -53,7 +55,7 @@ def generate(
                 if obj_schema["type"] == "null":
                     optional = True
                 else:
-                    extras, target = generate(obj_schema, title=title, no_comments=no_comments)
+                    extras, target = _generate(obj_schema, title=title, no_comments=no_comments)
                     result.append(extras)
                     union_items.append(target)
 
@@ -120,7 +122,7 @@ def generate(
             typed_dict = [f"class {obj_title}(TypedDict{total}):"]
 
             for key, value in obj_properties.items():
-                extras, param_annotation = generate(
+                extras, param_annotation = _generate(
                     value, title=key.capitalize(), no_comments=no_comments
                 )
                 result.append(extras)
@@ -156,7 +158,7 @@ def generate(
         # maxContains, minLength, maxLength, uniqueItems
 
         if obj_items := obj.get("items"):
-            extras, target = generate(obj_items, no_comments=no_comments)
+            extras, target = _generate(obj_items, no_comments=no_comments)
             result.append(extras)
             annotation = f"List[{target}]"
 
@@ -166,13 +168,13 @@ def generate(
                 (
                     extras,
                     target,
-                ) = generate(item, no_comments=no_comments)
+                ) = _generate(item, no_comments=no_comments)
                 result.append(extras)
                 tuple_annotation.append(target)
 
             if extra_item_type := obj.get("items"):
                 if extra_item_type is not True:
-                    extras, extra_type = generate(extra_item_type, no_comments=no_comments)
+                    extras, extra_type = _generate(extra_item_type, no_comments=no_comments)
                     result.append(extras)
                     if not no_comments:
                         result.append(
@@ -191,3 +193,23 @@ def generate(
     result = [i for i in result if i]
 
     return "\n".join(result), annotation
+
+
+text = """from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, List, Optional, TypedDict, Union
+
+if TYPE_CHECKING:
+    from typing_extensions import NotRequired
+
+{0[0]}
+
+{1} = {0[1]}
+"""
+
+
+def generate(
+    schema: dict, /, *, object_name: str = "GeneratedObject", no_comments: bool = False
+) -> str:
+    generated = _generate(schema, title=object_name, no_comments=no_comments)
+    return text.format(generated, object_name)
