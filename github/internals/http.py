@@ -67,7 +67,7 @@ class RateLimits(NamedTuple):
 # Issues
 # Licenses                   DONE
 # Markdown                   DONE
-# Meta
+# Meta                       DONE
 # Metrics
 # Migrations
 # OAuth authorizations
@@ -926,3 +926,17 @@ class HTTPClient:
         return await self.request("POST", "/markdown", data=data)
 
     # TODO: Implement Markdown raw request, idk
+
+    # === META === #
+
+    async def get_github_api_root(self):
+        return await self.request("GET", "/")
+
+    async def get_git_hub_meta_info(self):
+        return await self.request("GET", "/meta")
+
+    async def get_octocat(self):
+        return await self.request("GET", "/octocat")
+
+    async def get_the_zen_of_github(self):
+        return await self.request("GET", "/zen")
