@@ -61,7 +61,7 @@ class RateLimits(NamedTuple):
 # Enterprise administration
 # Gists                      DONE
 # Git database
-# Gitignore
+# Gitignore                  DONE
 # Interactions
 # Issues
 # Licenses                   DONE
@@ -834,7 +834,7 @@ class HTTPClient:
 
     # === LICENSES === #
 
-    async def get_commonly_used_licenses(self):
+    async def get_all_commonly_used_licenses(self):
         return await self.request("GET", "/licenses")
 
     async def get_license(self, *, license: str):
@@ -842,3 +842,11 @@ class HTTPClient:
 
     async def get_license_for_repository(self, *, owner: str, repo: str):
         return await self.request("GET", f"/repos/{owner}/{repo}/license")
+
+    # === GITIGNORE === #
+
+    async def get_all_gitignore_templates(self):
+        return await self.request("GET", "/gitignore/templates")
+
+    async def get_gitignore_template(self, *, name: str):
+        return await self.request("GET", f"/gitignore/templates/{name}")
