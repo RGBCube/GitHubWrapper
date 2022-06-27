@@ -48,7 +48,7 @@ class RateLimits(NamedTuple):
 # Billing
 # Branches
 # Checks
-# Codes of conduct
+# Codes of conduct           DONE
 # Code Scanning
 # Codespaces
 # Collaborators
@@ -855,3 +855,11 @@ class HTTPClient:
 
     async def get_emojis(self) -> Dict[str, str]:
         return await self.request("GET", "/emojis")
+
+    # === CODES OF CONDUCT === #
+
+    async def get_all_codes_of_conduct(self):
+        return await self.request("GET", "/codes_of_conduct")
+
+    async def get_code_of_conduct(self, *, key: str):
+        return await self.request("GET", f"/codes_of_conduct/{key}")
