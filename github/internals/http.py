@@ -9,15 +9,13 @@ import time
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Awaitable, Dict, List, Literal, NamedTuple, Optional, Union
 
-from aiohttp import ClientSession, TraceConfig, __version__ as aiohttp_version
+from aiohttp import ClientSession, __version__ as aiohttp_version
 
 from ..errors import error_from_request
 from ..utils import human_readable_time_until
 
 if TYPE_CHECKING:
-    from types import SimpleNamespace
-
-    from aiohttp import BasicAuth, TraceRequestEndParams, TraceRequestStartParams
+    from aiohttp import BasicAuth
     from typing_extensions import Self
 
     from ..objects import File
