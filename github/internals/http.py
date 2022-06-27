@@ -40,6 +40,7 @@ class RateLimits(NamedTuple):
 # Make specific errors
 # Make route /users/{username}/hovercard
 # Make it so an error gets raised when the cooldown is reached
+# Make markdown raw request route (???)
 
 # === ROUTES CHECKLIST === #
 # Actions
