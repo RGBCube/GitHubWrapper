@@ -59,7 +59,7 @@ class RateLimits(NamedTuple):
 # Deployments
 # Emojis
 # Enterprise administration
-# Gists                      DONE
+# Gists                      DONE(1st part)
 # Git database
 # Gitignore                  DONE
 # Interactions
@@ -78,11 +78,11 @@ class RateLimits(NamedTuple):
 # Rate limit
 # Reactions
 # Releases
-# Repositories               DONE
+# Repositories               DONE(1st part)
 # SCIM
 # Search
 # Teams
-# Users                      DONE
+# Users                      DONE(1st part)
 # Webhooks
 
 
