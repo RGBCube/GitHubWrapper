@@ -172,9 +172,9 @@ class HTTPClient:
 
         async with self.__session.request(
             method, f"https://api.github.com{path}", **kwargs
-        ) as request:
+        ) as response:
 
-            headers = request.headers
+            headers = response.headers
 
             self._rates = RateLimits(
                 int(headers["X-RateLimit-Remaining"]),
@@ -186,10 +186,13 @@ class HTTPClient:
                 datetime.now(timezone.utc),
             )
 
-            if 200 <= request.status <= 299:
-                return await request.json()
+            if 200 <= response.status <= 299:
+                if response.headers["Content-Type"] == "application/json":
+                    return await response.json()
 
-            raise error_from_request(request)
+                return await response.text(encoding="utf-8")
+
+            raise error_from_request(response)
 
     # === ROUTES === #
 
