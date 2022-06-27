@@ -123,48 +123,7 @@ class HTTPClient:
         self._last_ping = 0
         self._latency = 0
 
-        trace_config = TraceConfig()
-
-        @trace_config.on_request_start.append
-        async def on_request_start(
-            _: ClientSession, __: SimpleNamespace, params: TraceRequestStartParams
-        ) -> None:
-            if self.is_ratelimited:
-                log.info(
-                    "Ratelimit exceeded, trying again in"
-                    f" {human_readable_time_until(self._rates.reset_time - datetime.now(timezone.utc))} (URL:"
-                    f" {params.url}, method: {params.method})"
-                )
-
-                # TODO: I get about 3-4 hours of cooldown
-                # this might not be a good idea, might make
-                # this raise an error instead.
-                await asyncio.sleep(
-                    max((self._rates.reset_time - datetime.now(timezone.utc)).total_seconds(), 0)
-                )
-
-        @trace_config.on_request_end.append
-        async def on_request_end(
-            _: ClientSession, __: SimpleNamespace, params: TraceRequestEndParams
-        ) -> None:
-            """After-request hook to adjust remaining requests on this time frame."""
-            headers = params.response.headers
-
-            self._rates = RateLimits(
-                int(headers["X-RateLimit-Remaining"]),
-                int(headers["X-RateLimit-Used"]),
-                int(headers["X-RateLimit-Limit"]),
-                datetime.fromtimestamp(int(headers["X-RateLimit-Reset"])).replace(
-                    tzinfo=timezone.utc
-                ),
-                datetime.now(timezone.utc),
-            )
-
-        self.__session = ClientSession(
-            headers=headers,
-            auth=auth,
-            trace_configs=[trace_config],
-        )
+        self.__session = ClientSession(headers=headers, auth=auth)
 
         return self
 
@@ -198,11 +157,37 @@ class HTTPClient:
     async def request(
         self, method: Literal["GET", "POST", "PUT", "DELETE", "PATCH"], path: str, /, **kwargs: Any
     ):
+        if self.is_ratelimited:
+            log.info(
+                "Ratelimit exceeded, trying again in"
+                f" {human_readable_time_until(self._rates.reset_time - datetime.now(timezone.utc))} (URL:"
+                f" {path}, method: {method})"
+            )
+
+            # TODO: I get about 3-4 hours of cooldown
+            # this might not be a good idea, might make
+            # this raise an error instead.
+            await asyncio.sleep(
+                max((self._rates.reset_time - datetime.now(timezone.utc)).total_seconds(), 0)
+            )
+
         async with self.__session.request(
             method, f"https://api.github.com{path}", **kwargs
         ) as request:
             if 200 <= request.status <= 299:
                 return await request.json()
+
+            headers = request.headers
+
+            self._rates = RateLimits(
+                int(headers["X-RateLimit-Remaining"]),
+                int(headers["X-RateLimit-Used"]),
+                int(headers["X-RateLimit-Limit"]),
+                datetime.fromtimestamp(int(headers["X-RateLimit-Reset"])).replace(
+                    tzinfo=timezone.utc
+                ),
+                datetime.now(timezone.utc),
+            )
 
             raise error_from_request(request)
 
