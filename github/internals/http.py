@@ -57,7 +57,7 @@ class RateLimits(NamedTuple):
 # Dependency Graph
 # Deploy keys
 # Deployments
-# Emojis
+# Emojis                     DONE
 # Enterprise administration
 # Gists                      DONE(1st part)
 # Git database
@@ -850,3 +850,8 @@ class HTTPClient:
 
     async def get_gitignore_template(self, *, name: str):
         return await self.request("GET", f"/gitignore/templates/{name}")
+
+    # === EMOJIS === #
+
+    async def get_emojis(self) -> Dict[str, str]:
+        return await self.request("GET", "/emojis")
