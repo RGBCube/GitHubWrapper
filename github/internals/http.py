@@ -32,13 +32,19 @@ class RateLimits(NamedTuple):
     reset_time: Optional[datetime]
     last_request: Optional[datetime]
 
+# ====== STYLE GUIDE ===== #
+# All route method names should be
+# The exact same from the GitHub API
+# Docs, excluding 'the', 'a' etc
+# Names should be shortened, e.g:
+# Information -> Info
+# Repository -> Repo
 
 # ========= TODO ========= #
 # Make a good paginator
 # Make objects for all API Types
 # Make the requests return TypedDicts with those objects
 # Make specific errors
-# Make route /users/{username}/hovercard
 # Make it so an error gets raised when the cooldown is reached
 # Make markdown raw request route (???)
 
@@ -198,10 +204,10 @@ class HTTPClient:
 
     # === USERS === #
 
-    async def get_logged_in_user(self):
+    async def get_authenticated_user(self):
         return await self.request("GET", "/user")
 
-    async def update_logged_in_user(
+    async def update_authenticated_user(
         self,
         *,
         name: Optional[str] = None,
@@ -247,8 +253,21 @@ class HTTPClient:
     async def get_user(self, *, username: str):
         return await self.request("GET", f"/users/{username}")
 
-    # TODO: /users/{username}/hovercard
-    # IDK what to name it
+    async def get_context_info_for_user(
+            self,
+            *,
+            username: str,
+            subject_type: Optional[Literal["organization", "repository", "user", "pull_request"]] = None,
+            subject_id: Optional[int] = None,
+    ):
+        params = {}
+
+        if subject_type:
+            params["subject_type"] = subject_type
+        if subject_id:
+            params["subject_id"] = subject_id
+
+        return await self.request("GET", f"/users/{username}/hovercard", params=params)
 
     # === REPOS === #
 
