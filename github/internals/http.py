@@ -65,7 +65,7 @@ class RateLimits(NamedTuple):
 # Interactions
 # Issues
 # Licenses                   DONE
-# Markdown
+# Markdown                   DONE
 # Meta
 # Metrics
 # Migrations
@@ -866,7 +866,9 @@ class HTTPClient:
 
     # === DEPLOY KEYS === #
 
-    async def list_deploy_keys(self, *, owner: str, repo: str, per_page: Optional[int] = None, page: Optional[int] = None):
+    async def list_deploy_keys(
+        self, *, owner: str, repo: str, per_page: Optional[int] = None, page: Optional[int] = None
+    ):
         params = {}
 
         if per_page:
@@ -876,8 +878,18 @@ class HTTPClient:
 
         return await self.request("GET", f"/repos/{owner}/{repo}/keys", params=params)
 
-    async def create_deploy_key(self, *, owner: str, repo: str, title: Optional[str] = None, key: str, read_only: Optional[bool] = None):
-        data = {"key": key}
+    async def create_deploy_key(
+        self,
+        *,
+        owner: str,
+        repo: str,
+        title: Optional[str] = None,
+        key: str,
+        read_only: Optional[bool] = None,
+    ):
+        data = {
+            "key": key,
+        }
 
         if title:
             data["title"] = title
@@ -891,3 +903,25 @@ class HTTPClient:
 
     async def delete_deploy_key(self, *, owner: str, repo: str, key_id: int):
         return await self.request("DELETE", f"/repos/{owner}/{repo}/keys/{key_id}")
+
+    # === MARKDOWN === #
+
+    async def render_markdown(
+        self,
+        *,
+        text: str,
+        mode: Optional[Literal["markdown", "gfm"]] = None,
+        context: Optional[str] = None,
+    ):
+        data = {
+            "text": text,
+        }
+
+        if mode:
+            data["mode"] = mode
+        if context:
+            data["context"] = context
+
+        return await self.request("POST", "/markdown", data=data)
+
+    # TODO: Implement Markdown raw request, idk
