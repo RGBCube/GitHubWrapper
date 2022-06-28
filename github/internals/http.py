@@ -18,6 +18,7 @@ try:
     import orjson
 except ImportError:
     import json
+
     json_loads = json.loads
 else:
     json_loads = orjson.loads
@@ -188,7 +189,6 @@ class HTTPClient:
         async with self.__session.request(
             method, f"https://api.github.com{path}", **kwargs
         ) as response:
-
             headers = response.headers
 
             self._rates = RateLimits(
@@ -202,7 +202,7 @@ class HTTPClient:
             )
 
             if 200 <= response.status <= 299:
-                data = await response.text(encoding='utf-8')
+                data = await response.text(encoding="utf-8")
 
                 if response.headers["Content-Type"] == "application/json":
                     return json_loads(data)
