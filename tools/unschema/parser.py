@@ -38,7 +38,7 @@ def _generate(
         The generated TypedDicts, the result values name and the comments.
     """
     if title is None:
-        title = f"GeneratedObject{randint(100, 200)}"
+        title = f"GeneratedObject{randint(100, 999)}"
 
     # The other TypedDicts
     result = []
