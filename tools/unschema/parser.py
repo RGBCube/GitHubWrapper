@@ -2,7 +2,8 @@ from __future__ import annotations
 
 __all__ = ("generate",)
 
-from typing import Tuple  # , Any
+from random import randint
+from typing import Tuple, Optional  # , Any
 
 types = {
     "string": "str",
@@ -24,7 +25,7 @@ types = {
 
 
 def _generate(
-    obj: dict, /, *, title: str = "GeneratedObject", no_comments: bool = False
+    obj: dict, /, *, title: Optional[str] = None, no_comments: bool = False
 ) -> Tuple[str, str]:  # sourcery skip: low-code-quality
     """Makes TypedDict from a JSON Schema object.
 
@@ -36,6 +37,9 @@ def _generate(
     Returns:
         The generated TypedDicts, the result values name and the comments.
     """
+    if title is None:
+        title = f"GeneratedObject{randint(100, 200)}"
+
     # The other TypedDicts
     result = []
 
@@ -209,7 +213,7 @@ if TYPE_CHECKING:
 
 
 def generate(
-    schema: dict, /, *, object_name: str = "GeneratedObject", no_comments: bool = False
+    schema: dict, /, *, object_name: Optional[str] = None, no_comments: bool = False
 ) -> str:
     generated = _generate(schema, title=object_name, no_comments=no_comments)
-    return text.format(generated, object_name)
+    return text.format(generated, object_name or "GeneratedObject")
