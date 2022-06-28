@@ -294,10 +294,16 @@ class HTTPClient:
     async def unblock_user(self, *, username: str):
         return await self.request("DELETE", f"/user/blocks/{username}")
 
-    async def set_primary_email_visibility_for_authenticated_user(self, *, visibility: Literal["public", "private"]):
-        return await self.request("PATCH", "/user/email/visibility", json={"visibility": visibility})
+    async def set_primary_email_visibility_for_authenticated_user(
+        self, *, visibility: Literal["public", "private"]
+    ):
+        return await self.request(
+            "PATCH", "/user/email/visibility", json={"visibility": visibility}
+        )
 
-    async def list_email_addresses_for_the_authenticated_user(self, *, per_page: Optional[int] = None, page: Optional[int] = None):
+    async def list_email_addresses_for_the_authenticated_user(
+        self, *, per_page: Optional[int] = None, page: Optional[int] = None
+    ):
         params = {}
 
         if per_page:
@@ -313,7 +319,9 @@ class HTTPClient:
     async def delete_email_addresses_for_the_authenticated_user(self, *, emails: List[str]):
         return await self.request("DELETE", "/user/emails", json={"email": emails})
 
-    async def list_public_email_addresses_for_the_authenticated_user(self,* , per_page: Optional[int] = None, page: Optional[int] = None):
+    async def list_public_email_addresses_for_the_authenticated_user(
+        self, *, per_page: Optional[int] = None, page: Optional[int] = None
+    ):
         params = {}
 
         if per_page:
@@ -323,7 +331,9 @@ class HTTPClient:
 
         return await self.request("GET", "/user/emails/public", params=params)
 
-    async def list_followers_of_the_authenticated_user(self, *, per_page: Optional[int] = None, page: Optional[int] = None):
+    async def list_followers_of_the_authenticated_user(
+        self, *, per_page: Optional[int] = None, page: Optional[int] = None
+    ):
         params = {}
 
         if per_page:
@@ -333,7 +343,9 @@ class HTTPClient:
 
         return await self.request("GET", "/user/followers", params=params)
 
-    async def list_following_for_the_authenticated_user(self, *, per_page: Optional[int] = None, page: Optional[int] = None):
+    async def list_following_for_the_authenticated_user(
+        self, *, per_page: Optional[int] = None, page: Optional[int] = None
+    ):
         params = {}
 
         if per_page:
@@ -352,7 +364,9 @@ class HTTPClient:
     async def unfollow_user(self, *, username: str):
         return await self.request("DELETE", f"/user/following/{username}")
 
-    async def list_followers_for_user(self, *, username: str, per_page: Optional[int] = None, page: Optional[int] = None):
+    async def list_followers_for_user(
+        self, *, username: str, per_page: Optional[int] = None, page: Optional[int] = None
+    ):
         params = {}
 
         if per_page:
@@ -362,7 +376,9 @@ class HTTPClient:
 
         return await self.request("GET", f"/users/{username}/followers", params=params)
 
-    async def list_following_for_user(self, *, username: str, per_page: Optional[int] = None, page: Optional[int] = None):
+    async def list_following_for_user(
+        self, *, username: str, per_page: Optional[int] = None, page: Optional[int] = None
+    ):
         params = {}
 
         if per_page:
@@ -375,7 +391,9 @@ class HTTPClient:
     async def check_user_follows_another_user(self, *, username: str, target_user: str):
         return await self.request("GET", f"/users/{username}/following/{target_user}")
 
-    async def list_gpg_keys_for_authenticated_user(self, *, per_page: Optional[int] = None, page: Optional[int] = None):
+    async def list_gpg_keys_for_authenticated_user(
+        self, *, per_page: Optional[int] = None, page: Optional[int] = None
+    ):
         params = {}
 
         if per_page:
@@ -385,7 +403,9 @@ class HTTPClient:
 
         return await self.request("GET", "/user/gpg_keys", params=params)
 
-    async def create_gpg_key_for_authenticated_user(self, *, name: Optional[str] = None, armored_public_key: str):
+    async def create_gpg_key_for_authenticated_user(
+        self, *, name: Optional[str] = None, armored_public_key: str
+    ):
         data = {
             "armored_public_key": armored_public_key,
         }
@@ -401,7 +421,9 @@ class HTTPClient:
     async def delete_gpg_key_for_authenticated_user(self, *, gpg_key_id: int):
         return await self.request("DELETE", f"/user/gpg_keys/{gpg_key_id}")
 
-    async def list_gpg_keys_for_user(self, *, username: str, per_page: Optional[int] = None, page: Optional[int] = None):
+    async def list_gpg_keys_for_user(
+        self, *, username: str, per_page: Optional[int] = None, page: Optional[int] = None
+    ):
         params = {}
 
         if per_page:
@@ -411,7 +433,9 @@ class HTTPClient:
 
         return await self.request("GET", f"/users/{username}/gpg_keys", params=params)
 
-    async def list_public_ssh_keys_for_authenticated_user(self, *, per_page: Optional[int] = None, page: Optional[int] = None):
+    async def list_public_ssh_keys_for_authenticated_user(
+        self, *, per_page: Optional[int] = None, page: Optional[int] = None
+    ):
         params = {}
 
         if per_page:
@@ -421,7 +445,9 @@ class HTTPClient:
 
         return await self.request("GET", "/user/keys", params=params)
 
-    async def create_public_ssh_key_for_authenticated_user(self, *, title: Optional[str] = None, key: str):
+    async def create_public_ssh_key_for_authenticated_user(
+        self, *, title: Optional[str] = None, key: str
+    ):
         data = {
             "key": key,
         }
@@ -437,7 +463,9 @@ class HTTPClient:
     async def delete_public_ssh_key_for_authenticated_user(self, *, key_id: int):
         return await self.request("DELETE", f"/user/keys/{key_id}")
 
-    async def list_public_ssh_keys_for_user(self, *, username: str, per_page: Optional[int] = None, page: Optional[int] = None):
+    async def list_public_ssh_keys_for_user(
+        self, *, username: str, per_page: Optional[int] = None, page: Optional[int] = None
+    ):
         params = {}
 
         if per_page:
