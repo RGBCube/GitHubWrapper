@@ -14,6 +14,14 @@ from aiohttp import ClientSession, __version__ as aiohttp_version
 from ..errors import error_from_request
 from ..utils import human_readable_time_until
 
+try:
+    import orjson
+except ImportError:
+    import json
+    json_loads = json.loads
+else:
+    json_loads = orjson.loads
+
 if TYPE_CHECKING:
     from aiohttp import BasicAuth
     from typing_extensions import Self
@@ -194,10 +202,12 @@ class HTTPClient:
             )
 
             if 200 <= response.status <= 299:
-                if response.headers["Content-Type"] == "application/json":
-                    return await response.json()
+                data = await response.text(encoding='utf-8')
 
-                return await response.text(encoding="utf-8")
+                if response.headers["Content-Type"] == "application/json":
+                    return json_loads(data)
+
+                return data
 
             raise error_from_request(response)
 
