@@ -3,7 +3,7 @@ from __future__ import annotations
 __all__ = ("generate",)
 
 from random import randint
-from typing import Tuple, Optional  # , Any
+from typing import Optional, Tuple  # , Any
 
 types = {
     "string": "str",

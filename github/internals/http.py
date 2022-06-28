@@ -97,7 +97,7 @@ class RateLimits(NamedTuple):
 # Releases
 # Repositories               DONE
 # SCIM
-# Search
+# Search                     DONE
 # Teams
 # Users                      DONE
 # Webhooks
@@ -1368,3 +1368,183 @@ class HTTPClient:
 
     async def get_the_zen_of_github(self):
         return await self.request("GET", "/zen")
+
+    # === SEARCH === #
+
+    async def search_code(
+        self,
+        *,
+        q: str,
+        sort: Optional[Literal["indexed"]] = None,
+        order: Optional[Literal["desc", "asc"]] = None,
+        per_page: Optional[int] = None,
+        page: Optional[int] = None,
+    ):
+        data = {
+            "q": q,
+        }
+
+        if sort:
+            data["sort"] = sort
+        if order:
+            data["order"] = order
+        if per_page:
+            data["per_page"] = per_page
+        if page:
+            data["page"] = page
+
+        return await self.request("GET", "/search/code", data=data)
+
+    async def search_commits(
+        self,
+        *,
+        q: str,
+        sort: Optional[Literal["author-date", "committer-date"]] = None,
+        order: Optional[Literal["desc", "asc"]] = None,
+        per_page: Optional[int] = None,
+        page: Optional[int] = None,
+    ):
+        params = {
+            "q": q,
+        }
+
+        if sort:
+            params["sort"] = sort
+        if order:
+            params["order"] = order
+        if per_page:
+            params["per_page"] = per_page
+        if page:
+            params["page"] = page
+
+        return await self.request("GET", "/search/commits", params=params)
+
+    async def search_issues_and_pull_requests(
+        self,
+        *,
+        q: str,
+        sort: Optional[
+            Literal[
+                "comments",
+                "reactions",
+                "reactions-+1",
+                "reactions--1",
+                "reactions-smile",
+                "reactions-thinking_face",
+                "reactions-heart",
+                "reactions-tada",
+                "interactions",
+                "created",
+                "updated",
+            ]
+        ] = None,
+        order: Optional[Literal["desc", "asc"]] = None,
+        per_page: Optional[int] = None,
+        page: Optional[int] = None,
+    ):
+        params = {
+            "q": q,
+        }
+
+        if sort:
+            params["sort"] = sort
+        if order:
+            params["order"] = order
+        if per_page:
+            params["per_page"] = per_page
+        if page:
+            params["page"] = page
+
+        return await self.request("GET", "/search/issues", params=params)
+
+    async def search_labels(
+        self,
+        *,
+        repository_id: int,
+        q: str,
+        sort: Optional[Literal["created", "updated"]] = None,
+        order: Optional[Literal["desc", "asc"]] = None,
+        per_page: Optional[int] = None,
+        page: Optional[int] = None,
+    ):
+        params = {
+            "repository_id": repository_id,
+            "q": q,
+        }
+
+        if sort:
+            params["sort"] = sort
+        if order:
+            params["order"] = order
+        if per_page:
+            params["per_page"] = per_page
+        if page:
+            params["page"] = page
+
+        return await self.request("GET", "/search/labels", params=params)
+
+    async def search_repos(
+        self,
+        *,
+        q: str,
+        sort: Optional[Literal["stars", "forks", "help-wanted-issues", "updated"]] = None,
+        order: Optional[Literal["desc", "asc"]] = None,
+        per_page: Optional[int] = None,
+        page: Optional[int] = None,
+    ):
+        params = {
+            "q": q,
+        }
+
+        if sort:
+            params["sort"] = sort
+        if order:
+            params["order"] = order
+        if per_page:
+            params["per_page"] = per_page
+        if page:
+            params["page"] = page
+
+        return await self.request("GET", "/search/repositories", params=params)
+
+    async def search_topics(
+        self,
+        *,
+        q: str,
+        per_page: Optional[int] = None,
+        page: Optional[int] = None,
+    ):
+        params = {
+            "q": q,
+        }
+
+        if per_page:
+            params["per_page"] = per_page
+        if page:
+            params["page"] = page
+
+        return await self.request("GET", "/search/topics", params=params)
+
+    async def search_users(
+        self,
+        *,
+        q: str,
+        sort: Optional[Literal["followers", "repositories", "joined"]] = None,
+        order: Optional[Literal["desc", "asc"]] = None,
+        per_page: Optional[int] = None,
+        page: Optional[int] = None,
+    ):
+        params = {
+            "q": q,
+        }
+
+        if sort:
+            params["sort"] = sort
+        if order:
+            params["order"] = order
+        if per_page:
+            params["per_page"] = per_page
+        if page:
+            params["page"] = page
+
+        return await self.request("GET", "/search/users", params=params)
