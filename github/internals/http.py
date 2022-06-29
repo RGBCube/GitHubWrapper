@@ -15,7 +15,7 @@ from ..errors import error_from_request
 from ..utils import human_readable_time_until
 
 try:
-    import orjson
+    import orjson  # type: ignore
 except ImportError:
     import json
 
@@ -171,7 +171,7 @@ class HTTPClient:
         if self.is_ratelimited:
             log.info(
                 "Ratelimit exceeded, trying again in"
-                f" {human_readable_time_until(self._rates.reset_time - datetime.now(timezone.utc))} (URL:"
+                f" {human_readable_time_until(self._rates.reset_time - datetime.now(timezone.utc))} (URL:"  # type: ignore
                 f" {path}, method: {method})"
             )
 
@@ -179,7 +179,7 @@ class HTTPClient:
             # this might not be a good idea, might make
             # this raise an error instead.
             await asyncio.sleep(
-                max((self._rates.reset_time - datetime.now(timezone.utc)).total_seconds(), 0)
+                max((self._rates.reset_time - datetime.now(timezone.utc)).total_seconds(), 0)  # type: ignore
             )
 
         async with self.__session.request(
@@ -957,7 +957,7 @@ class HTTPClient:
         committer: Optional[Committer] = None,
         author: Optional[Author] = None,
     ):
-        data = {
+        data: Dict[str, Union[str, Committer, Author]] = {
             "message": message,
             "content": content,
         }
@@ -985,7 +985,7 @@ class HTTPClient:
         committer: Optional[OptionalCommitter] = None,
         author: Optional[OptionalAuthor] = None,
     ):
-        data = {
+        data: Dict[str, Union[str, OptionalCommitter, OptionalAuthor]] = {
             "message": message,
             "sha": sha,
         }
@@ -1278,7 +1278,7 @@ class HTTPClient:
 
     # === EMOJIS === #
 
-    async def get_emojis(self) -> Dict[str, str]:
+    async def get_emojis(self):
         return await self.request("GET", "/emojis")
 
     # === CODES OF CONDUCT === #
@@ -1312,7 +1312,7 @@ class HTTPClient:
         key: str,
         read_only: Optional[bool] = None,
     ):
-        data = {
+        data: Dict[str, Union[str, bool]] = {
             "key": key,
         }
 
@@ -1376,7 +1376,7 @@ class HTTPClient:
         per_page: Optional[int] = None,
         page: Optional[int] = None,
     ):
-        data = {
+        data: Dict[str, Union[str, int]] = {
             "q": q,
         }
 
@@ -1400,7 +1400,7 @@ class HTTPClient:
         per_page: Optional[int] = None,
         page: Optional[int] = None,
     ):
-        params = {
+        params: Dict[str, Union[str, int]] = {
             "q": q,
         }
 
@@ -1438,7 +1438,7 @@ class HTTPClient:
         per_page: Optional[int] = None,
         page: Optional[int] = None,
     ):
-        params = {
+        params: Dict[str, Union[str, int]] = {
             "q": q,
         }
 
@@ -1488,7 +1488,7 @@ class HTTPClient:
         per_page: Optional[int] = None,
         page: Optional[int] = None,
     ):
-        params = {
+        params: Dict[str, Union[str, int]] = {
             "q": q,
         }
 
@@ -1510,7 +1510,7 @@ class HTTPClient:
         per_page: Optional[int] = None,
         page: Optional[int] = None,
     ):
-        params = {
+        params: Dict[str, Union[str, int]] = {
             "q": q,
         }
 
@@ -1530,7 +1530,7 @@ class HTTPClient:
         per_page: Optional[int] = None,
         page: Optional[int] = None,
     ):
-        params = {
+        params: Dict[str, Union[str, int]] = {
             "q": q,
         }
 
