@@ -35,9 +35,9 @@ log = logging.getLogger("github")
 
 
 class RateLimits(NamedTuple):
-    remaining: Optional[int]
-    used: Optional[int]
-    total: Optional[int]
+    remaining: int
+    used: int
+    total: int
     reset_time: Optional[datetime]
     last_request: Optional[datetime]
 
@@ -122,8 +122,7 @@ class HTTPClient:
     ) -> Self:
         self = super(cls, cls).__new__(cls)
 
-        if not headers:
-            headers = {}
+        headers = headers or {}
 
         headers.setdefault(
             "User-Agent",
@@ -131,14 +130,12 @@ class HTTPClient:
             f" 2.0.0a CPython/{platform.python_version()} aiohttp/{aiohttp_version}",
         )
 
-        self._rates = RateLimits(None, None, None, None, None)
-        self.__headers = headers
-        self.__auth = auth
-
-        self._last_ping = 0
-        self._latency = 0
-
         self.__session = ClientSession(headers=headers, auth=auth)
+
+        self._rates = RateLimits(60, 0, 60, None, None)
+
+        self._last_ping = float("-inf")
+        self._latency = 0
 
         return self
 
@@ -153,18 +150,17 @@ class HTTPClient:
 
     @property
     def is_ratelimited(self) -> bool:
-        remaining = self._rates.remaining
-        return remaining is not None and remaining < 2
+        return self._rates.remaining < 2
 
     async def latency(self) -> float:
         last_ping = self._last_ping
 
-        # If there was no ping or the last ping was more than 5 seconds ago.
-        if not last_ping or time.monotonic() > last_ping + 5 or self.is_ratelimited:
+        # If there was no ping or the last ping was more than 5 seconds ago (or is currently ratelimited).
+        if not self.is_ratelimited and time.monotonic() > last_ping + 5:
             self._last_ping = time.monotonic()
 
             start = time.monotonic()
-            await self.request("GET", "/")
+            await self.get_github_api_root()
             self._latency = time.monotonic() - start
 
         return self._latency
