@@ -23,4 +23,4 @@ jobs:
         run: pip install -U pip bandit
 
       - name: Run Bandit
-        run: bandit --recursive --ignore B605,B311 ./
+        run: bandit --recursive --skip B605,B311 ./
