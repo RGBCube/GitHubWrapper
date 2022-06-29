@@ -25,9 +25,11 @@ aiohttp = "^3.8.1"
 typing-extensions = "*"
 
 [tool.poetry.dev-dependencies]
+bandit = "*"
 black = "*"
 flynt = "*"
 isort = "*"
+pyright = "*"
 unimport = "*"
 
 [tool.black]
