@@ -173,7 +173,7 @@ class HTTPClient:
         if self.is_ratelimited:
             log.info(
                 "Ratelimit exceeded, trying again in"
-                f" {human_readable_time_until(self._rates.reset_time - datetime.now(timezone.utc))} (URL:"  # type: ignore
+                f" {human_readable_time_until(self._rates.reset_time - datetime.now(timezone.utc))} (URL:"
                 f" {path}, method: {method})"
             )
 
@@ -181,7 +181,7 @@ class HTTPClient:
             # this might not be a good idea, might make
             # this raise an error instead.
             await asyncio.sleep(
-                max((self._rates.reset_time - datetime.now(timezone.utc)).total_seconds(), 0)  # type: ignore
+                max((self._rates.reset_time - datetime.now(timezone.utc)).total_seconds(), 0)
             )
 
         async with self.__session.request(

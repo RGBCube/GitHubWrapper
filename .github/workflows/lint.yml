@@ -24,7 +24,7 @@ jobs:
 
       - name: Run Unimport
         continue-on-error: true
-        run: unimport ./ --ignore-init --gitignore -r
+        run: unimport ./ --ignore-init --gitignore --remove
 
       - name: Run Isort
         run: isort ./
