@@ -38,8 +38,8 @@ class RateLimits(NamedTuple):
     remaining: int
     used: int
     total: int
-    reset_time: Optional[datetime]
-    last_request: Optional[datetime]
+    reset_time: datetime
+    last_request: datetime
 
 
 # ====== STYLE GUIDE ===== #
@@ -119,7 +119,7 @@ class HTTPClient:
         *,
         headers: Optional[Dict[str, str]] = None,
         auth: Optional[BasicAuth] = None,
-    ) -> Self:
+    ) -> HTTPClient:
         self = super(cls, cls).__new__(cls)
 
         headers = headers or {}
@@ -132,7 +132,9 @@ class HTTPClient:
 
         self.__session = ClientSession(headers=headers, auth=auth)
 
-        self._rates = RateLimits(60, 0, 60, None, None)
+        time_0 = datetime.fromtimestamp(0)
+
+        self._rates = RateLimits(60, 0, 60, time_0, time_0)
 
         self._last_ping = float("-inf")
         self._latency = 0
