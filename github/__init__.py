@@ -28,8 +28,6 @@ __authors__ = ("VarMonke", "sudosnok", "contributors")
 __version__ = "2.0.0a"
 __license__ = "MIT"
 __copyright__ = "Copyright (c) 2022-present VarMonke, sudosnok & contributors"
-
-from . import utils
 from .errors import *
 from .internals import *
 from .objects import *
