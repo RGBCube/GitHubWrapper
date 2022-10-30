@@ -48,5 +48,5 @@ https://github.com/GithubPythonBot
 ```
 -->
 ## Links
-- `Discord Server <https://discord.gg/DWhwsQ5TsT>`_
-- `GitHub API Documentation <https://docs.github.com/en/rest>`_
+- [Discord Server](https://discord.gg/DWhwsQ5TsT)
+- [GitHub API Documentation](https://docs.github.com/en/rest)
