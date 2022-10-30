@@ -1,3 +1,4 @@
+# Feel free to fork! I don't want to maintain this anymore.
 # GitHub API Wrapper
 
 [![Discord Server Invite](https://discord.com/api/guilds/963406460107235328/widget.png)](https://discord.gg/DWhwsQ5TsT)
